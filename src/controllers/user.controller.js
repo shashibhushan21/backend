@@ -1,7 +1,8 @@
 import {ApiError} from "../utils/ApiError.js";
 import {asyncHandler} from "../utils/asyncHandler.js";
 import {User} from "../models/user.model.js";
-import {uploadOnCloudinary} from "../utils/cloudinary.js";
+// import {uploadOnCloudinary} from "../utils/cloudinary.js";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
 const registerUser = asyncHandler(async (req, res) => {
@@ -40,30 +41,33 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(409, "User already exists");
     }
     
-   const avtarLocalPath = req.files?.avatar[0]?.path;
+   const avtarLocalPath = req.files?.avtar[0]?.path;
 
   const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
 
+  console.log("localPath",avtarLocalPath, coverImageLocalPath);
   if (!avtarLocalPath) {
-    throw new ApiError(400, "Avatar file is required");
+    throw new ApiError(400, "Avtar file is required");
   }
- const avatar = await uploadOnCloudinary(avtarLocalPath);
+ const avtar = await uploadOnCloudinary(avtarLocalPath);
  const coverImage = await uploadOnCloudinary(coverImageLocalPath);
 
- if (!avatar) {
-    throw new ApiError(400, "Avatar upload failed");
+ console.log("after uplod cloudinary",avtar, coverImage);
+ if (!avtar) {
+    throw new ApiError(400, "Avtar upload failed");
 }
 
 const user = await User.create({
     fullName,
-    avtar: avatar.url,
+    avtar: avtar.url,
     coverImage: coverImage?.url || "",
     email,
     password,
     username: username.toLowerCase(),
 })
+console.log("user", user);
 
-const createdUser = await user.findById(user._id).select(
+const createdUser = await User.findById(user._id).select(
     "-password -refreshToken"
 )
 
