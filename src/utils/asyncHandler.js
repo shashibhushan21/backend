@@ -6,8 +6,8 @@ const asyncHandler = (requestHandler) =>{
     }
 }
 
-// export  {asyncHandler};
-export default asyncHandler;
+export  {asyncHandler};
+// export default asyncHandler;
 
 
 
