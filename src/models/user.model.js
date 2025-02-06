@@ -28,6 +28,9 @@ const userSchema = new Schema(
             type: String, //cloudinary url
             required: true,
         },
+        coverImage: {
+            type: String, //cloudinary url
+        },
         username: {
             type: String, //cloudinary url
         },

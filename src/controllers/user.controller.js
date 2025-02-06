@@ -18,7 +18,7 @@ const registerUser = asyncHandler(async (req, res) => {
   //return success response
 
   const {fullName, email, username, password} = req.body;
-    console.log(fullName, email, username, password);
+    // console.log(fullName, email, username, password);
 
     // if(!fullName || !email || !username || !password){
     //     res.status(400);
@@ -45,14 +45,14 @@ const registerUser = asyncHandler(async (req, res) => {
 
   const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
 
-  console.log("localPath",avtarLocalPath, coverImageLocalPath);
+//   console.log("localPath",avtarLocalPath, coverImageLocalPath);
   if (!avtarLocalPath) {
     throw new ApiError(400, "Avtar file is required");
   }
  const avtar = await uploadOnCloudinary(avtarLocalPath);
  const coverImage = await uploadOnCloudinary(coverImageLocalPath);
 
- console.log("after uplod cloudinary",avtar, coverImage);
+//  console.log("after uplod cloudinary",avtar, coverImage);
  if (!avtar) {
     throw new ApiError(400, "Avtar upload failed");
 }
