@@ -25,6 +25,10 @@ const userSchema = new Schema(
             trim: true,
             index: true,
         },
+        phonenumber:{
+            type: Number,
+            required: true,
+        },
         avtar: {
             type: String, //cloudinary url
             required: true,
