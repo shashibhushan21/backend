@@ -165,9 +165,15 @@ const logoutUser = asyncHandler(async (req, res) => {
     await User.findByIdAndUpdate(
         req.user._id,
         {
-            $set: {
-                refreshToken: null,
+        //    $set: {
+        //         refreshToken: null,
+        //     } 
+            //// ya to upar wala ya niche wala koi bhi ek
+
+            $unset:{
+                refreshToken: 1
             }
+
         }, {
         new: true
     }
@@ -223,24 +229,57 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
 })
 
-const changeCurrentPassword = asyncHandler(async (req, res) => {
-    const { oldPassword, newPassword } = req.body
+// const changeCurrentPassword = asyncHandler(async (req, res) => {
+//     const { oldPassword, newPassword } = req.body
 
-    const user = await User.findById(req.user._id)
+//     const user = await User.findById(req.user._id)
 
-    const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
+//     const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
 
-    if (!isPasswordCorrect) {
-        throw new ApiError(401, "Invalid old password")
+//     if (!isPasswordCorrect) {
+//         throw new ApiError(401, "Invalid old password")
+//     }
+
+//     user.password = newPassword
+//     // user.password = await bcrypt.hash(newPassword, 10);
+//     await user.save({ validateBeforeSave: false });
+
+//     return res.status(200)
+//         .json(new ApiResponse(200, {}, "Password changed successfully"))
+
+// })
+
+const changeCurrentPassword = asyncHandler(async(req, res) => {
+    try {
+            const {oldPassword, newPassword} = req.body
+    
+            // 1. Validate input
+            if (!oldPassword || !newPassword) {
+                throw new ApiError(400, "Both old and new passwords are required");
+            }
+            
+            // 2. Find user
+            const user = await User.findById(req.user?._id)
+    
+            // 3. Verify old password
+            const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
+        
+            if (!isPasswordCorrect) {
+                throw new ApiError(400, "Invalid old Password")
+            }
+            
+    
+            // 4. Update password
+            user.password = newPassword
+            await user.save({validateBeforeSave: false})
+        
+            return res
+            .status(200)
+            .json(new ApiResponse(200, {}, "Password changed Successfully"))
+    } catch (error) {
+        throw new ApiError(400, error?.message || "Password change failed")
     }
-
-    user.password = newPassword
-    await user.save({ validateBeforeSave: false })
-
-    return res.status(200)
-        .json(new ApiResponse(200, {}, "Password changed successfully"))
-
-})
+    })
 
 const getCurrentUser = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id)
@@ -274,7 +313,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 
 const updateAvtar = asyncHandler(async (req, res) => {
     const avtarLocalPath = req.file?.path
-
+    console.log(avtarLocalPath)
     if (!avtarLocalPath) {
         throw new ApiError(400, "Avtar is missing")
     }
@@ -299,6 +338,40 @@ const updateAvtar = asyncHandler(async (req, res) => {
         .status(200)
         .json(new ApiResponse(200, user, "Avtar updated successfully"))
 })
+
+// const updateAvtar = asyncHandler(async(req, res) => {
+    
+//     const avatarLocalPath = req.file?.path
+    
+//     if(!avatarLocalPath) {
+//         throw new ApiError(400, "Avatar file is missing")
+//     }
+
+//     const avatar = await uploadOnCloudinary(avatarLocalPath)
+
+//     if (!avatar.url) {
+//         throw new ApiError(400, "Error while uploading on cloudinary")
+//     }
+
+//     const user = await User.findByIdAndUpdate(
+//         req.user?._id,
+//         {
+//             $set:{
+//                 avatar: avatar.url
+//             }
+//         },
+//         {new: true}
+//     ).select("-password")
+
+//     return res 
+//     .status(200)
+//     .json(
+//         new ApiResponse(200, user, "Avatar updated successfully")
+//     )
+
+
+// })
+
 
 const updateCoverImage = asyncHandler(async (req, res) => {
     const coverImageLocalPath = req.file?.path
@@ -349,7 +422,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
                 from: "subscriptions",
                 localField: "_id",
                 foreignField: "channel",
-                as: "subscriptions"
+                as: "subscribers"
             }
         },
         {

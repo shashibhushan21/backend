@@ -44,7 +44,7 @@ router.route("/current-user").get(verifyJWT,getCurrentUser);
 
 router.route("/update-acount").patch(verifyJWT,updateAccountDetails);
 
-router.route("/avtar").patch(verifyJWT,upload.single ('avtar'),updateAvtar);
+router.route("/avtar").patch(verifyJWT,upload.single('avtar'),updateAvtar);
 
 router.route("/cover-image").patch(verifyJWT,upload.single("coverImage"),updateCoverImage);
 
